@@ -1,4 +1,5 @@
 from logging import raiseExceptions
+from multiprocessing import context
 from operator import ge
 from smtplib import quoteaddr
 from django.shortcuts import render
@@ -33,19 +34,31 @@ def login(request):
     token, _ = Token.objects.get_or_create(user=user)
     serializer = UserSerializer(user, context={'request': request})
     return Response({'user': serializer.data, 'token': token.key}, status=status.HTTP_200_OK)
-    # return Response({'token': token.key}, status=status.HTTP_200_OK)
+
+
+class UserAPI(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    @action(detail=True, methods=['post'])
-    def create_user(self, request, pk=None):
+    # @action(detail=True, methods=['post'])
+    def create(self, request, pk=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # self.perform_create(serializer)
+        user = serializer.save()
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({
+            'user': serializer.data,
+            'token': token.key},
+            status=status.HTTP_201_CREATED)
 
 
 class TradeViewSet(viewsets.ModelViewSet):

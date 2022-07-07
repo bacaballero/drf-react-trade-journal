@@ -22,7 +22,7 @@ export default function Login({ token, setToken }) {
         password: password,
       }),
     };
-    return await fetch("/login/", requestOptions)
+    return await fetch("/api/auth/login/", requestOptions)
       .then((response) => console.log(response.json()))
       ///.then((token) => setToken(token))
       .then(navigate("/"));

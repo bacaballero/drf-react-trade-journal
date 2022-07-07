@@ -27,7 +27,7 @@ export default function HomePage({ token, setToken }) {
           </Nav>
           <Nav>
             <Nav.Link href="/register">Register</Nav.Link>
-            <Nav.Link href="/login">Login</Nav.Link>
+            <Nav.Link href="/api/auth/login">Login</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
@@ -36,7 +36,7 @@ export default function HomePage({ token, setToken }) {
           <Route path="/" element={renderHomePage()} />
           <Route path="/register" element={<Register />} />
           <Route
-            path="/login"
+            path="/api/auth/login"
             element={<Login token={token} setToken={setToken} />}
           />
         </Routes>
