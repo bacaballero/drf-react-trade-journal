@@ -18,6 +18,13 @@ from rest_framework.authtoken.models import Token
 # Create your views here.
 
 
+@api_view(['POST'])
+@permission_classes((permissions.IsAuthenticated,))
+def logout(request, format=None):
+    request.user.auth_token.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
