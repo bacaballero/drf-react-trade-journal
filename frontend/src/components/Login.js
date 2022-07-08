@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Form, Button } from "react-bootstrap";
+import { Container, Form, Button, Alert } from "react-bootstrap";
 import { Navigate, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
@@ -10,7 +10,8 @@ export default function Login({ token, setToken }) {
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const requestOptions = {
       method: "POST",
       headers: {
@@ -22,14 +23,35 @@ export default function Login({ token, setToken }) {
         password: password,
       }),
     };
-    return await fetch("/api/auth/login/", requestOptions)
-      .then((response) => console.log(response.json()))
-      ///.then((token) => setToken(token))
-      .then(navigate("/"));
+    try {
+      return await fetch("/api/auth/login/", requestOptions).then(
+        (response) => {
+          console.log(response.json());
+          if (response.ok) {
+            navigate("/");
+          } else {
+            setErrorMsg("Invalid login credentials");
+          }
+        }
+      );
+    } catch (err) {
+      console.log(err.message);
+    }
   };
+
+  function AlertDismissible() {
+    if (errorMsg != "") {
+      return (
+        <Alert variant="danger" onClose={() => setErrorMsg("")} dismissible>
+          {errorMsg}
+        </Alert>
+      );
+    }
+  }
 
   return (
     <Container>
+      <AlertDismissible />
       <Form>
         <Form.Group className="mb-3" controlId="formBasicUsername">
           <Form.Label>Username</Form.Label>
