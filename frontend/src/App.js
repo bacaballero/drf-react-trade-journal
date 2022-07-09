@@ -1,13 +1,13 @@
 import "./App.css";
-import HomePage from "./components/HomePage";
+import HomePage from "./Components/HomePage";
 import { useState } from "react";
+import { AuthProvider } from "./Context";
 
 function App() {
-  const [token, setToken] = useState();
   return (
-    <div>
-      <HomePage token={token} setToken={setToken} />
-    </div>
+    <AuthProvider>
+      <HomePage />
+    </AuthProvider>
   );
 }
 

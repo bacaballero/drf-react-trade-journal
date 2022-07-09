@@ -6,15 +6,30 @@ import {
   Route,
   Link,
   Redirect,
+  useNavigate,
 } from "react-router-dom";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import Register from "./Register";
 import Login from "./Login";
+import { useAuthDispatch, logout, useAuthState } from "../Context";
 
-export default function HomePage({ token, setToken }) {
-  function renderHomePage() {
-    return <p>Homepage</p>;
-  }
+export default function HomePage() {
+  const dispatch = useAuthDispatch(); // read dispatch method from context
+  const userDetails = useAuthState(); //read user details from context
+  //console.log(userDetails);
+
+  const handleLogout = () => {
+    logout(dispatch); //call the logout action
+  };
+
+  const renderHomePage = () => {
+    console.log(userDetails);
+    return userDetails.user ? (
+      <p>Homepage {userDetails.user.username}</p>
+    ) : (
+      <p>Homepage</p>
+    );
+  };
   return (
     <>
       <Navbar bg="primary" variant="dark">
@@ -35,10 +50,7 @@ export default function HomePage({ token, setToken }) {
         <Routes>
           <Route path="/" element={renderHomePage()} />
           <Route path="/register" element={<Register />} />
-          <Route
-            path="/api/auth/login"
-            element={<Login token={token} setToken={setToken} />}
-          />
+          <Route path="/api/auth/login" element={<Login />} />
         </Routes>
       </BrowserRouter>
     </>

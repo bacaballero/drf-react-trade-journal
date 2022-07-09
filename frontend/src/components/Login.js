@@ -2,14 +2,30 @@ import React, { useState } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
 import { Navigate, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { loginUser, useAuthState, useAuthDispatch } from "../Context";
 
-export default function Login({ token, setToken }) {
+export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
+  const dispatch = useAuthDispatch();
+  const { loading, errorMessage } = useAuthState(); //read the values of loading and errorMessage from context
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    let payload = { username, password };
+    try {
+      let response = await loginUser(dispatch, payload); //loginUser action makes the request and handles all the neccessary state changes
+      if (!response.user) return;
+      navigate("/"); //navigate to homepage on success
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  /*
   const handleSubmit = async (e) => {
     e.preventDefault();
     const requestOptions = {
@@ -38,12 +54,13 @@ export default function Login({ token, setToken }) {
       console.log(err.message);
     }
   };
+  */
 
   function AlertDismissible() {
-    if (errorMsg != "") {
+    if (errorMessage) {
       return (
-        <Alert variant="danger" onClose={() => setErrorMsg("")} dismissible>
-          {errorMsg}
+        <Alert variant="danger" dismissible>
+          {errorMessage}
         </Alert>
       );
     }
@@ -71,7 +88,12 @@ export default function Login({ token, setToken }) {
             onChange={(e) => setPassword(e.target.value)}
           />
         </Form.Group>
-        <Button variant="primary" type="submit" onClick={handleSubmit}>
+        <Button
+          variant="primary"
+          type="submit"
+          disabled={loading}
+          onClick={handleLogin}
+        >
           Submit
         </Button>
       </Form>
