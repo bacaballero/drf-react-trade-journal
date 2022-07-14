@@ -12,7 +12,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   const dispatch = useAuthDispatch();
-  const { loading, errorMessage } = useAuthState(); //read the values of loading and errorMessage from context
+  const { loading } = useAuthState(); //read the value of loading from context
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,47 +20,21 @@ export default function Login() {
     try {
       let response = await loginUser(dispatch, payload); //loginUser action makes the request and handles all the neccessary state changes
       if (!response.user) return;
-      navigate("/"); //navigate to homepage on success
+      navigate("/trades"); //navigate on success
+      console.log("response:", response);
+      console.log(localStorage);
+      localStorage.setItem("user", response.user);
     } catch (error) {
       console.log(error);
+      setErrorMsg("Invalid login credentials");
     }
   };
-  /*
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-    };
-    try {
-      return await fetch("/api/auth/login/", requestOptions).then(
-        (response) => {
-          console.log(response.json());
-          if (response.ok) {
-            navigate("/");
-          } else {
-            setErrorMsg("Invalid login credentials");
-          }
-        }
-      );
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-  */
 
   function AlertDismissible() {
-    if (errorMessage) {
+    if (errorMsg != "") {
       return (
-        <Alert variant="danger" dismissible>
-          {errorMessage}
+        <Alert variant="danger" onClose={() => setErrorMsg("")} dismissible>
+          {errorMsg}
         </Alert>
       );
     }
